@@ -1,0 +1,39 @@
+function out = RUN_module(argstr, macro)
+% run each experimental module according 
+out.which_module = argstr;
+out.macro = macro;
+
+out = do_PARAMS(out);
+
+try
+    
+    out.trlcount = 1;
+    
+    for iBlock = 1:out.P
+    
+    while trlcount <= out.P.
+    switch argstr
+
+        case 'VWM'
+            
+        case 'QUEST'
+            
+        case 'EXP'
+
+    end
+
+catch ME
+    
+    ListenChar(0)
+    PsychPortAudio('Close', out.P.pahandle);
+    sca 
+
+end
+
+ListenChar(0)
+PsychPortAudio('Close', out.P.pahandle);
+sca 
+
+
+
+end
