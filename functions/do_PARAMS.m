@@ -7,7 +7,6 @@ function in = do_PARAMS(in)
 
 P.FLAG.debug = true;
 
-
 %% start ptb
 
 P = local_init_ptb(P);
@@ -79,11 +78,10 @@ P.colormap = [198, 0, 0;...      red
 
 %% current trl parameters
 P.frames.fix = 1:100;
-P.frames.cue = 1:20;
-P.frames.post_cue = 1:20;
 P.frames.squares = 1:49;     % set to 49 frames instead of 50 to take into account stable delay of starting reset sound
 P.frames.delta = []; 
 P.frames.flash = 1;          % default MUST = 1
+P.frames.IsquareInt = 1:100;
 
 if P.frames.flash ~= 1
     error('flash should last one frame')
@@ -102,7 +100,7 @@ switch in.which_module
         P.nblocks = in.macro.endblck - in.macro.strtblck + 1;
         P.ntrlsblock = 160;
         for iB = 1:P.nblocks
-            P.B(iB).which_cond = local_preallocate_mainEXP(P);
+            P.B(iB).which_cond = local_preallocate_mainEXP(P);            
         end
         
     case 'VWM'
@@ -113,10 +111,27 @@ switch in.which_module
     case 'QUEST'
         P.nblocks = 1;
         P.ntrlsblock = 50;
-        % no preallocation needed
+        P = local_prepare_QUEST(P);
+
 end
 
-% back assign parameter structure
+%% preallocate data matrices
+% columns as follows:
+% 1- SOA, 2-flash present (1) or absent (0), 3- square same (1) or
+% different (0), 4- subj resp for flash (as before), 5- subj resp for
+% memory (as before).
+
+% do the same for timestamps:
+% 1- fixation, 2- square array, 3- SOA, 4- flash, 5- t-SOA, 6- RT square,
+% 7- RT flash
+
+for iB = 1:P.nblocks
+    in.blocks(iB).data = nan(P.ntrlsblock, 5);    
+    in.blocks(iB).timestamp = nan(P.ntrlsblock, 7);
+    
+end
+
+%% back assign parameter structure
 in.P = P;
 
 end
@@ -130,7 +145,7 @@ function P = local_init_ptb(P)
 KbName('UnifyKeyNames'); %enables cross-platform key iqd's
 
 P.displayScreen = max(Screen('Screens'));
-rect0 = [0 0 1920 540]; % debug purpose
+rect0 = [0 0 1920 750]; % debug purpose
 [P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128], rect0);
 % Retreive the maximum priority number
 topPriorityLevel = MaxPriority(P.win);
@@ -182,6 +197,17 @@ PsychPortAudio('Volume', P.pahandle, 1);
 PsychPortAudio('FillBuffer', P.pahandle, [P.resetBeep;...
     P.resetBeep]);
 
+% set keyboard responses
+P.zKey = KbName('z');
+P.mKey = KbName('m');
+P.yKey = KbName('y');
+P.nKey = KbName('n');
+P.oKey = KbName('o');
+P.lKey = KbName('l');
+P.iKey = KbName('i');
+P.kKey = KbName('k');
+P.escapeKey = KbName('ESCAPE');
+
 
 end
 
@@ -212,9 +238,29 @@ which_cond = shuffled;
 end
 
 function which_cond = local_preallocate_VWM(P)
-
+%%
 unshuffled = repmat([0; 1], P.ntrlsblock/2,1);
 which_cond = randsample(unshuffled, P.ntrlsblock);
 
 end
+
+function P = local_prepare_QUEST(P)
+
+
+
+
+
+
+
+
+
+
+end
+
+
+
+
+
+
+
 

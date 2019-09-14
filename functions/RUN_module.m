@@ -4,10 +4,14 @@ out.which_module = argstr;
 out.macro = macro;
 
 out = do_PARAMS(out);
+iBlock = 1;
 
 try
-        
-    for iBlock = 1:out.P.nblocks
+    
+    %% start every module with a small (12 trials) practice block
+    do_PRACTICE(out);
+    
+    while iBlock <= out.P.nblocks
         
         out.blockcount = iBlock;
         out.trlcount = 1;
@@ -34,6 +38,9 @@ try
             
         end
         
+        iBlock = out.blockcount; % if the block was aborted
+        iBlock = iBlock +1;
+        
     end
     
 catch ME
@@ -41,7 +48,9 @@ catch ME
     ListenChar(0)
     PsychPortAudio('Close', out.P.pahandle);
     sca 
-
+    
+    rethrow(ME)
+    
 end
 
 ListenChar(0)
