@@ -8,21 +8,27 @@ clc
 
 macro = HELPER_functions('setpaths');
 
-%% run the three modules of the experiment
-
-% VWM part
+%% VWM part
 if macro.FLAG.VWM
     M_vwm = RUN_module('VWM', macro);
     HELPER_functions('savefile', M_vwm)
 end
 
-% QUEST part
+%% QUEST part
 if macro.FLAG.QUEST
-    M_quest = RUN_module('QUEST', macro);
+    
+    isquestOK = false;
+    
+    while ~isquestOK
+        M_quest = RUN_module('QUEST', macro);
+        [isquestOK, contrast] = HELPER_functions('contrast', M_quest);
+    end
+    
     HELPER_functions('savefile', M_quest)
+    
 end
 
-% VWM part
+%% VWM part
 if macro.FLAG.EXP
     M_EXP = RUN_module('EXP', macro);
     HELPER_functions('savefile', M_EXP)

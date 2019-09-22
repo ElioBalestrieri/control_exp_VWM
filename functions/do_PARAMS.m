@@ -151,9 +151,8 @@ KbName('UnifyKeyNames'); %enables cross-platform key iqd's
 
 P.displayScreen = max(Screen('Screens'));
 rect0 = [0 0 1920 750]; % debug purpose
-[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128], rect0);
+[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128]); %, rect0);
 % Retreive the maximum priority number
-topPriorityLevel = MaxPriority(P.win);
 [P.xCenter,P.yCenter] = RectCenter(P.rect);
 P.ifi = Screen('GetFlipInterval', P.win);
 
@@ -167,7 +166,9 @@ end
 
 P.black = BlackIndex(P.displayScreen);
 P.white = WhiteIndex(P.displayScreen);
-P.grey = P.white/2;
+P.grey = round(P.white/2);
+P.redfix = round([0.6 0 0]*255);
+P.greenfix = round([0 0.6 0]*255);
 
 P.srStrct = Screen('Resolution', P.displayScreen);
 P.pxlScreen = [P.srStrct.width, P.srStrct.height];
@@ -191,16 +192,16 @@ P.resetBeep = sin(500*xBeep*2*pi); % actual "beep": a sinusoid at 500 Hz
 % wait for device to start (1=yes)
 P.waitDev = 1;
 % open PsychAudio port
-P.pahandle = PsychPortAudio('Open', [], 1, 1, P.sampleBeep,...
-    P.nrchannels);
-
-% Set the volume to one
-PsychPortAudio('Volume', P.pahandle, 1);
-
-% Fill the audio playback buffer with the audio data, doubled for stereo
-% presentation
-PsychPortAudio('FillBuffer', P.pahandle, [P.resetBeep;...
-    P.resetBeep]);
+% P.pahandle = PsychPortAudio('Open', [], 1, 1, P.sampleBeep,...
+%     P.nrchannels);
+% 
+% % Set the volume to one
+% PsychPortAudio('Volume', P.pahandle, 1);
+% 
+% % Fill the audio playback buffer with the audio data, doubled for stereo
+% % presentation
+% PsychPortAudio('FillBuffer', P.pahandle, [P.resetBeep;...
+%     P.resetBeep]);
 
 % set keyboard responses
 P.zKey = KbName('z');
@@ -268,8 +269,8 @@ P.Q.thisQUEST = QuestCreate(P.Q.tGuess, P.Q.tGuessSD, P.Q.setThreshold, ...
 P.Q.thisQUEST.normalizePdf = 1;
 
 P.vectorPi = [1 3 5 7];
-P.yCoorPrompt = round(sin(pi*P.vectorPi/4)*3*P.yxFLASHnoise(1)+P.srStrct.height/2);
-P.xCoorPrompt = round(cos(pi*P.vectorPi/4)*3*P.yxFLASHnoise(2)+P.srStrct.width/2);
+P.yCoorPrompt = round(sin(pi*P.vectorPi/4)*3*P.yxFLASHnoise(1)+P.yCenter);
+P.xCoorPrompt = round(cos(pi*P.vectorPi/4)*3*P.yxFLASHnoise(2)+P.xCenter);
 
 
 

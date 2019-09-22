@@ -46,7 +46,9 @@ try
 catch ME
     
     ListenChar(0)
-    PsychPortAudio('Close', out.P.pahandle);
+    if isfield(out.P, 'pahandle')
+        PsychPortAudio('Close', out.P.pahandle);
+    end
     sca 
     
     rethrow(ME)
@@ -54,7 +56,9 @@ catch ME
 end
 
 ListenChar(0)
-PsychPortAudio('Close', out.P.pahandle);
+if isfield(out.P, 'pahandle')
+    PsychPortAudio('Close', out.P.pahandle);
+end
 sca 
 
 end

@@ -1,7 +1,5 @@
 function out = do_trial_QUEST(out)
 
-foo = 1;
-
 % determine contrast for the present trial
 cur_web = 10^QuestQuantile(out.P.Q.thisQUEST);
 cur_lum = out.P.anon.weber2cnt(cur_web);
@@ -45,6 +43,125 @@ totifis = numel(0:out.P.ifi:1);
 nifisPRE = numel(0:out.P.ifi:tPoint);
 nifisPOST = totifis-nifisPRE; nifisPRE = nifisPRE-1; % to account flash appearance
 
+%% start trial
+% Color the screen grey
+Screen('FillRect', out.P.win, out.P.grey);
+Screen('Flip', out.P.win);
+WaitSecs(.2);
+
+% red Fixation Marker
+DrawFixationMarker(out.P.win,out.P.xCenter,...
+    out.P.yCenter,out.P.redfix, out.P.grey);
+Screen('Flip',  out.P.win);
+
+% let the subject start the trial
+KbStrokeWait;
+
+% green Fixation Marker
+DrawFixationMarker(out.P.win,out.P.xCenter,...
+    out.P.yCenter,out.P.greenfix, out.P.grey);
+
+Screen('Flip', out.P.win);
+
+WaitSecs(.5);
+
+% Color the screen grey
+Screen('FillRect', out.P.win, out.P.grey);
+vbl = Screen('Flip', out.P.win);
+WaitSecs(.15);
+
+%% pre stim 
+bslTRL = GetSecs;
+for frameGo=1:nifisPRE
+    
+    % Color the screen grey
+    Screen('FillRect', out.P.win, out.P.grey);
+    % Flip to the screen
+    vbl = Screen('Flip', out.P.win, vbl+.5*out.P.ifi);
+
+end
+out.blocks.timestamp(out.trlcount, 1) = GetSecs-bslTRL;
+
+%% stim 
+bslTRL = GetSecs;
+for frameGo = out.P.frames.flash
+    
+    Screen('DrawTexture', out.P.win,  indxMat,  squareFLASH1,...
+        squareFLASH1);
+    % Flip to the screen
+    vbl = Screen('Flip',  out.P.win, vbl+.5*out.P.ifi);
+
+end
+out.blocks.timestamp(out.trlcount, 2) = GetSecs-bslTRL;
+
+%% post stim 
+bslTRL = GetSecs;
+for frameGo=1:nifisPOST
+    
+    % Color the screen grey
+    Screen('FillRect', out.P.win, out.P.grey);
+    % Flip to the screen
+    vbl = Screen('Flip', out.P.win, vbl+.5*out.P.ifi);
+
+end
+out.blocks.timestamp(out.trlcount, 3) = GetSecs-bslTRL;
+
+%% prompt response
+% prompt response 
+Screen('TextSize',  out.P.win, 30);
+% Screen('TextFont',  window, 'Tahoma');
+DrawFormattedText( out.P.win, 'O',out.P.xCoorPrompt(1), out.P.yCoorPrompt(4), out.P.black);
+DrawFormattedText( out.P.win, 'I',out.P.xCoorPrompt(2), out.P.yCoorPrompt(3),  out.P.black);
+DrawFormattedText( out.P.win, 'K',out.P.xCoorPrompt(3), out.P.yCoorPrompt(2),  out.P.black);
+DrawFormattedText( out.P.win, 'L',out.P.xCoorPrompt(4), out.P.yCoorPrompt(1),  out.P.black);
+Screen('DrawLine', out.P.win, out.P.black, out.P.xCenter,out.P.yCoorPrompt(2),...
+    out.P.xCenter,out.P.yCoorPrompt(3));
+Screen('DrawLine', out.P.win, out.P.black, out.P.xCoorPrompt(3), out.P.yCenter,...
+    out.P.xCoorPrompt(4), out.P.yCenter);
+
+Screen('Flip',  out.P.win);
+
+%% wait for response
+isrightbuttonpress = false;
+bslTRL = GetSecs;
+while ~isrightbuttonpress
+    
+    [~, t, code, ~] = KbCheck;
+
+    keycode=find(code);
+    if keycode == out.P.escapeKey
+        out = do_abort(out);
+        isrightbuttonpress = true;
+        subjresp = 666;
+    elseif keycode== out.P.oKey
+        subjresp=1;
+        isrightbuttonpress = true;
+    elseif keycode== out.P.lKey
+        subjresp=7;
+        isrightbuttonpress = true;
+    elseif keycode== out.P.kKey
+        subjresp=5;
+        isrightbuttonpress = true;
+    elseif keycode== out.P.iKey
+        subjresp=3;
+        isrightbuttonpress = true;
+    end
+
+    if isrightbuttonpress
+        rt = t-bslTRL;
+    end
+end
+
+%% determine correctness of resp
+isrespcorrect = subjresp==posQuad;
+%... and save all the info in the logfiles
+out.blocks.data(out.trlcount,4) = subjresp;
+out.blocks.data(out.trlcount,5) = isrespcorrect;
+out.blocks.timestamp(out.trlcount,4) = rt;
+
+%% update QUEST based on the current response
+out.P.Q.thisQUEST = QuestUpdate(out.P.Q.thisQUEST,log10(cur_web),isrespcorrect);
+Screen('Close', indxMat);
 
 
 end

@@ -11,6 +11,11 @@ switch argstr
         M = varargin{1};
         local_SAVEFILE(M);
         
+    case 'contrast'
+        
+        M = varargin{1};
+        [varargout{1}, varargout{2}] = local_CONTRAST(M);
+        
 end
 
 
@@ -64,5 +69,74 @@ switch M.which_module
 end
 
 save(fullfile(M.macro.data_path, filename), 'M')
+
+end
+
+function [iscntOK, out_contrast] = local_CONTRAST(M)
+
+cnt = mean(M.blocks.data((end-5):end, 1));
+num_lines = 1;
+
+if cnt<.25   
+
+    dlg_title = 'QUEST outcome';
+    prompt = {'contrast', 'keep this value (yes/no)?'};
+    definput = {num2str(cnt), 'yes'};
+    subj_answer = inputdlg(prompt,dlg_title,num_lines,definput);
+    
+elseif cnt>=.25
+    
+    warnMSG = {'WARNING!', 'contrast too high!',...
+        'Keeping this contrast will lead to repeat the QUEST',...
+        'Press OK to navigate to the window for contrast selection'};
+    waitfor(msgbox(warnMSG,'Warn','warn'))
+    
+    dlg_title = 'QUEST outcome';
+    prompt = {'contrast', 'keep this value (yes/no)?'};
+    definput = {num2str(cnt), 'no'};
+    subj_answer = inputdlg(prompt,dlg_title,num_lines,definput);
+
+elseif isnan(cnt)
+    
+    warnMSG = {'WARNING!', 'NaN in contrast',...
+        'Keeping this contrast will lead to repeat the QUEST',...
+        'Press OK to navigate to the window for contrast selection'};
+    waitfor(msgbox(warnMSG,'Warn','warn'));
+   
+    dlg_title = 'QUEST outcome';
+    prompt = {'contrast', 'keep this value (yes/no)?'};
+    definput = {num2str(cnt), 'no'};
+    subj_answer = inputdlg(prompt,dlg_title,num_lines,definput); 
+    
+elseif cnt<.01
+    
+    warnMSG = {'WARNING!', 'contrast unexpectedly low',...
+        'Keeping this contrast will lead to repeat the QUEST',...
+        'Press OK to navigate to the window for contrast selection'};
+    waitfor(msgbox(warnMSG,'Warn','warn'));
+    
+    infoMSG = {'If the subject has already performed QUEST and ended up',...
+        'with an amazing low value, I would simply recommend a value of .025',...
+        'Otherwise, it is better to repeat QUEST (simply select "no" in the next prompt'};
+    waitfor(msgbox(infoMSG,'Help','help'));
+    
+    new_cnt = .025;
+   
+    dlg_title = 'QUEST outcome';
+    prompt = {'contrast', 'keep this value (yes/no)?'};
+    definput = {num2str(new_cnt), 'yes'};
+    subj_answer = inputdlg(prompt,dlg_title,num_lines,definput); 
+
+end
+
+%% double check the value obtained after the GUI
+
+incnt = str2double(subj_answer{1});
+keepval = strcmpi(subj_answer{2}, 'yes');
+
+go_on = incnt<.25 & incnt>.01;
+
+iscntOK = go_on & keepval;
+out_contrast = incnt;
 
 end
