@@ -59,8 +59,8 @@ function [outIm, cntX, cntY]= drawFlash_gaussian(inX,inY,contrast,radius,bslCol,
 
     radShadow = rad_theory(all_indx); %------------------------------------ define vec equal spaced till radius value
     abstCoor=1:radius;                %------------------------------------ abstract linear coordinates of pixels, from O
-    cntX = inX/2+randsample(-noisePos(2):noisePos(2),1);
-    cntY = inY/2+randsample(-noisePos(1):noisePos(1),1);
+    cntX = inX/2+datasample(-noisePos(2):noisePos(2),1);
+    cntY = inY/2+datasample(-noisePos(1):noisePos(1),1);
     
     for ii=1:nAngles  % start rotation for num of angles of the grad vect
 

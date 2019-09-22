@@ -23,7 +23,7 @@ function out = local_SETPATH
 prompt = {'Participant Number', 'Initials', 'run VWM evaluation?',...
     'run QUEST?', 'run main EXP?', 'starting block', 'ending block'};
 dlg_title = 'VWM & attention';
-definput = {'00', 'AA', 'yes', 'yes', 'yes', '1', '6'};
+definput = {'00', 'AA', 'no', 'yes', 'yes', '1', '6'};
 num_lines = 1;
 subj_answer = inputdlg(prompt,dlg_title,num_lines,definput);
 subj_answer{1} = num2str(str2double(subj_answer{1}), '%02d');

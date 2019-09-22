@@ -7,6 +7,10 @@ function in = do_PARAMS(in)
 
 P.FLAG.debug = true;
 
+if P.FLAG.debug
+    warning('script executed in debug mode')
+end
+
 %% start ptb
 
 P = local_init_ptb(P);
@@ -74,7 +78,8 @@ P.colormap = [198, 0, 0;...      red
                 33, 198, 0; ...     green
                 191, 198, 0];%      yellowish
             
-
+% background color .5
+P.baseluminance = .5;
 
 %% current trl parameters
 P.frames.fix = 1:100;
@@ -164,8 +169,8 @@ P.black = BlackIndex(P.displayScreen);
 P.white = WhiteIndex(P.displayScreen);
 P.grey = P.white/2;
 
-srStrct = Screen('Resolution', P.displayScreen);
-P.pxlScreen = [srStrct.width, srStrct.height];
+P.srStrct = Screen('Resolution', P.displayScreen);
+P.pxlScreen = [P.srStrct.width, P.srStrct.height];
 % manual measurements of screen dimension, since
 % " Screen('DisplaySize',main.displayScreen); "  was inaccurate [????]
 P.m_width = 520;
@@ -208,6 +213,9 @@ P.iKey = KbName('i');
 P.kKey = KbName('k');
 P.escapeKey = KbName('ESCAPE');
 
+% hide cursor
+HideCursor(P.displayScreen);
+
 
 end
 
@@ -246,11 +254,22 @@ end
 
 function P = local_prepare_QUEST(P)
 
+P.anon.cnt2weber = @(cnt) cnt/(P.baseluminance);
+P.anon.weber2cnt = @(web) web*P.baseluminance;
 
+P.Q.tGuess = log10(P.anon.cnt2weber(.1)); 
+P.Q.tGuessSD = 3; 
+P.Q.setThreshold = .6; 
+P.Q.beta = 3.5;
+P.Q.lapse_rate = .01;
+P.Q.guess_rate = .25;
+P.Q.thisQUEST = QuestCreate(P.Q.tGuess, P.Q.tGuessSD, P.Q.setThreshold, ...
+    P.Q.beta, P.Q.lapse_rate, P.Q.guess_rate, 1/255, 1.5); %last 2 par used where: , 1/255, 1.5
+P.Q.thisQUEST.normalizePdf = 1;
 
-
-
-
+P.vectorPi = [1 3 5 7];
+P.yCoorPrompt = round(sin(pi*P.vectorPi/4)*3*P.yxFLASHnoise(1)+P.srStrct.height/2);
+P.xCoorPrompt = round(cos(pi*P.vectorPi/4)*3*P.yxFLASHnoise(2)+P.srStrct.width/2);
 
 
 
