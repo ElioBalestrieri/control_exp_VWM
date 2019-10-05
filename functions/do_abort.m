@@ -35,7 +35,7 @@ while no_resp
                     'Now be careful:\n'...
                     'Do you want to interrupt the Experiment?\n'...
                     '"Y" -> the experiment will stop\n'...
-                    '"N" -> the experiment will restart from the next block'];
+                    '"N" -> the experiment will restart from the next block (or module)'];
 
             Screen('FillRect',out.P.win, out.P.grey)
             % dx cue response
@@ -48,6 +48,7 @@ while no_resp
                 
                 % here bring the block n to the end
                 out.blockcount = out.P.nblocks;
+                out.FLAGabort = true;
                 
                 return
 

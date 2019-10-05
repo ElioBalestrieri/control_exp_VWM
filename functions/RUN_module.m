@@ -3,7 +3,12 @@ function out = RUN_module(argstr, macro)
 out.which_module = argstr;
 out.macro = macro;
 
-out = do_PARAMS(out);
+if isfield(macro, 'contrast')
+    out = do_PARAMS(out, macro.contrast);
+else
+    out = do_PARAMS(out);
+end
+
 iBlock = 1;
 
 try

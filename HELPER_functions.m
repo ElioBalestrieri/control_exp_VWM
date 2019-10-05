@@ -108,7 +108,7 @@ elseif isnan(cnt)
     definput = {num2str(cnt), 'no'};
     subj_answer = inputdlg(prompt,dlg_title,num_lines,definput); 
     
-elseif cnt<.01
+elseif cnt<.05
     
     warnMSG = {'WARNING!', 'contrast unexpectedly low',...
         'Keeping this contrast will lead to repeat the QUEST',...
@@ -116,11 +116,11 @@ elseif cnt<.01
     waitfor(msgbox(warnMSG,'Warn','warn'));
     
     infoMSG = {'If the subject has already performed QUEST and ended up',...
-        'with an amazing low value, I would simply recommend a value of .025',...
+        'with an amazing low value, I would simply recommend a value of .05',...
         'Otherwise, it is better to repeat QUEST (simply select "no" in the next prompt'};
     waitfor(msgbox(infoMSG,'Help','help'));
     
-    new_cnt = .025;
+    new_cnt = .05;
    
     dlg_title = 'QUEST outcome';
     prompt = {'contrast', 'keep this value (yes/no)?'};
@@ -134,7 +134,7 @@ end
 incnt = str2double(subj_answer{1});
 keepval = strcmpi(subj_answer{2}, 'yes');
 
-go_on = incnt<.25 & incnt>.01;
+go_on = incnt<.25 & incnt>.05;
 
 iscntOK = go_on & keepval;
 out_contrast = incnt;

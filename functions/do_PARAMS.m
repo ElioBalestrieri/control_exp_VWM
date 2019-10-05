@@ -1,4 +1,4 @@
-function in = do_PARAMS(in)
+function in = do_PARAMS(in, varargin)
 % define common parameters for all modules, and specific parameters for
 % each of them
 
@@ -27,8 +27,10 @@ visAngle2pixels = @(deg, main) round((tan(deg*convert/2)*2*main.dist_subj)/...  
 % most of them are defined as radius (easier to handle to the center of the
 % screen); 
 
-% define contrast as input from GUI
-P.cntFLASHthres = 1;
+% define contrast as input from previous module (if present)
+if ~isempty(varargin)
+    P.cntFLASHthres = varargin{1};
+end
 
 % radius of cue 
 P.radius_cue = round(visAngle2pixels(4,P)/2); %###################### 2° of radius --> circle has diameter 4 vis angles    
@@ -136,6 +138,9 @@ for iB = 1:P.nblocks
     
 end
 
+% create uint8 greyscaled matrix for trials without flash
+P.greyScaled = uint8(ones(P.rect(4), P.rect(3), 3)*128);
+
 %% back assign parameter structure
 in.P = P;
 
@@ -192,16 +197,16 @@ P.resetBeep = sin(500*xBeep*2*pi); % actual "beep": a sinusoid at 500 Hz
 % wait for device to start (1=yes)
 P.waitDev = 1;
 % open PsychAudio port
-% P.pahandle = PsychPortAudio('Open', [], 1, 1, P.sampleBeep,...
-%     P.nrchannels);
-% 
-% % Set the volume to one
-% PsychPortAudio('Volume', P.pahandle, 1);
-% 
-% % Fill the audio playback buffer with the audio data, doubled for stereo
-% % presentation
-% PsychPortAudio('FillBuffer', P.pahandle, [P.resetBeep;...
-%     P.resetBeep]);
+P.pahandle = PsychPortAudio('Open', [], 1, 1, P.sampleBeep,...
+    P.nrchannels);
+
+% Set the volume to one
+PsychPortAudio('Volume', P.pahandle, 1);
+
+% Fill the audio playback buffer with the audio data, doubled for stereo
+% presentation
+PsychPortAudio('FillBuffer', P.pahandle, [P.resetBeep;...
+    P.resetBeep]);
 
 % set keyboard responses
 P.zKey = KbName('z');
@@ -239,6 +244,7 @@ acc = 1;
 for iIdx = rnd_idx
     
     shuffled(acc, :) = one_block_unshuffled(iIdx,:);
+    acc = acc+1;
     
 end
 

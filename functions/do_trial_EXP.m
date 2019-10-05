@@ -1,175 +1,170 @@
-function main = RUN_trl(main, cr)
+function out = do_trial_EXP(out)
 
-% define current load condition
-condLoad = main.condLoad(cr.lLoop);
-% define current cued positions
-conPos = main.square_change(cr.lLoop,:);
+% empty current (cr) structure
+cr = [];
+% define whether the array is changing
+ischanging = out.P.B(out.blockcount).which_cond(out.trlcount,1);
+% determine square colors for the present trial
+swap_color = out.P.colormap(randsample(1:6,5,'false'),:)';
+cr.which_cols1 = swap_color(:,1:4);
+% determine current gap
+cr.waitframes = 1:out.P.B(out.blockcount).which_cond(out.trlcount,3);
+cr.postframes = 1:(max(out.P.frames.IsquareInt)-max(cr.waitframes)-1);
+% determine flash vs catch
+cr.isflashpresent = out.P.B(out.blockcount).which_cond(out.trlcount,2);
+
+% draw flash image
+[out.P.flashIMAGE, cntX, cntY] = drawFlash_gaussian(out.P.rect(3),...
+    out.P.rect(4),out.P.cntFLASHthres, out.P.radiusFLASH,...
+    .5, 2000, out.P.yxFLASHnoise);
+
+out.P.squareFLASH = [cntX-out.P.radiusFLASH, cntY-out.P.radiusFLASH,...
+cntX+out.P.radiusFLASH, cntY+out.P.radiusFLASH];
+
+% convert the texture into uint8 values
+out.P.flashIMAGE = uint8(out.P.flashIMAGE*255);
+
+% draw texture
+out.P.texture_FLASH = Screen('MakeTexture', out.P.win,...
+    out.P.flashIMAGE);
+
+% determine color arrays
+if ischanging==0
+    cr.which_cols2 = cr.which_cols1;
+else
+    which_square = randi(4);
+    cr.which_cols2 = cr.which_cols1;
+    cr.which_cols2(:, which_square) = swap_color(:,end);
+end
+
 % for while loop
 waitResponse = false;
 
 %% to save movie
 % if cr.lLoop ==1
 %     movieFile = 'moviefile';
-%     main.movie = Screen('CreateMovie', main.win, movieFile)
+%     out.P.movie = Screen('CreateMovie', out.P.win, movieFile)
 % end
 
 %% fixation -- 1 sec -- (100 frame @100Hz)
 
-Screen('FillRect',main.win, main.grey)
-cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+Screen('FillRect',out.P.win, out.P.grey)
+cr.vbl = Screen('Flip',out.P.win);
 
 base = GetSecs();
-for frameL = cr.frames.fix
+for frameL = out.P.frames.fix
     
-    Screen('FrameArc', main.win, [0 0 0], [main.xCenter-main.radiusFLASH/2,...
-        main.yCenter-main.radiusFLASH/2, main.xCenter+main.radiusFLASH/2,...
-        main.yCenter+main.radiusFLASH/2], 0, 360,2,2)
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
 
 % movie
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
      
 end
 tFix = GetSecs()-base;
-main.timestamp(cr.lLoop, 1) = tFix;
-%main.image_fix{cr.lLoop} = Screen('GetImage',main.win);
-
-
-%% cue -- 200 msec -- (20 frame @100 Hz)
-
-Screen('FillRect',main.win, main.grey)
-%cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
-
-base = GetSecs();
-for frameL = cr.frames.cue
-
-
-    
-    HELPER_cue(main, condLoad, conPos)
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
-    
-%     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
-%     end
-    
-end
-tCue = GetSecs()-base;
-main.timestamp(cr.lLoop, 2) = tCue;
-%main.image_cue{cr.lLoop} = Screen('GetImage',main.win);
-
-%% fixation post cue -- 200 ms -- (20 frames @100Hz)
-
-Screen('FillRect',main.win, main.grey)
-%cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
-
-base = GetSecs();
-for frameL = cr.frames.post_cue
-    
-    HELPER_cue(main, 0, [])
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
-    
-%     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
-%     end
-    
-end
-tFix = GetSecs()-base;
-main.timestamp(cr.lLoop, 3) = tFix;
+out.blocks(out.blockcount).timestamp(out.trlcount, 1) = tFix;
+%out.P.image_fix{cr.lLoop} = Screen('GetImage',out.P.win);
 
 
 %% array -- 500 msec -- (50 frames @100 Hz) + beep
 
-% Screen('FillRect',main.win, [128 128 128])
-% cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+% Screen('FillRect',out.P.win, [128 128 128])
+% cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
 
 base = GetSecs();
-for frameL = cr.frames.squares
+for frameL = out.P.frames.squares
     
-    HELPER_cue(main, 0, [])
-    Screen('FillRect', main.win, cr.color1, main.square_pos)
+
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
     
-    if frameL == cr.frames.squares(end-1)
-        PsychPortAudio('Start', main.pahandle, main.repetition, 0, 1);
+    if frameL == out.P.frames.squares(end-1)
+        PsychPortAudio('Start', out.P.pahandle, out.P.repetition, 0, 1);
         % don't wait for sound to end 
-%         [main.actualStartTime, ~, ~, main.estStopTime] = ...
-%             PsychPortAudio('Stop', main.pahandle, 0, 0);
+%         [out.P.actualStartTime, ~, ~, out.P.estStopTime] = ...
+%             PsychPortAudio('Stop', out.P.pahandle, 0, 0);
 
     end
     
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+    cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
 end
 tArray = GetSecs()-base;
-main.timestamp(cr.lLoop, 4) = tArray;
-%main.image_array{cr.lLoop} = Screen('GetImage',main.win);
+out.blocks(out.blockcount).timestamp(out.trlcount, 2) = tArray;
+%out.P.image_array{cr.lLoop} = Screen('GetImage',out.P.win);
 
 
 %% GAP -- delta t  -- waiting for flash
 
 base = GetSecs();
-for frameL = cr.frames.wait_before
+for frameL = cr.waitframes
     
     % draw grey screen
-    Screen('FillRect',main.win, main.grey)
+    Screen('FillRect',out.P.win, out.P.grey)
     
-    HELPER_cue(main, 0, [])
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
 end
-tArray = GetSecs()-base;
-main.timestamp(cr.lLoop, 5) = tArray;
+tGap = GetSecs()-base;
+out.blocks(out.blockcount).timestamp(out.trlcount, 3) = tGap;
 
 %% FLASH
 
 base = GetSecs();
-for frameL = cr.frames.flash
-
-    Screen('DrawTexture', main.win, main.texture_FLASH, ...
-        main.squareFLASH,main.squareFLASH);
-    HELPER_cue(main, 0, [])
+for frameL = out.P.frames.flash
+    
+    % draw grey screen
+    Screen('FillRect',out.P.win, out.P.grey)
+    % placeholder
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    %flash texture
+    Screen('DrawTexture', out.P.win, out.P.texture_FLASH, ...
+        out.P.squareFLASH,out.P.squareFLASH);
     
     % Flip to the screen
-    cr.vbl = Screen('Flip', main.win, cr.vbl+.5*main.ifi);
+    cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
 end
 tFlash = GetSecs()-base;
-main.timestamp(cr.lLoop, 6) = tFlash;
-%main.image_flash{cr.lLoop} = Screen('GetImage',main.win);
+out.blocks(out.blockcount).timestamp(out.trlcount, 4) = tFlash;
+%out.P.image_flash{cr.lLoop} = Screen('GetImage',out.P.win);
 
 
 %% GAP -- 1-delta t -- waiting for test memory array
 
 base = GetSecs();
-for frameL = cr.frames.wait_after
+for frameL = cr.postframes
     
     % draw grey screen
-    Screen('FillRect',main.win, main.grey)
+    Screen('FillRect',out.P.win, out.P.grey)
+    % placeholder
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     
-    HELPER_cue(main, 0, [])
-    cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+    % flip
+    cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
 end
 tArray = GetSecs()-base;
-main.timestamp(cr.lLoop, 7) = tArray;
-
+out.blocks(out.blockcount).timestamp(out.trlcount, 5) = tArray;
 
 
 %% TEST ARRAY -- until response --
@@ -178,44 +173,42 @@ base = GetSecs();
 while waitResponse==false
     
 %     %debug square cuing
-%     msg_debug = ['load ' num2str(main.condLoad(cr.lLoop)) 'cue '...
-%         num2str(main.square_change(cr.lLoop,:))];
+%     msg_debug = ['load ' num2str(out.P.condLoad(cr.lLoop)) 'cue '...
+%         num2str(out.P.square_change(cr.lLoop,:))];
 %     
-%     DrawFormattedText(main.win,msg_debug,...
-%         main.xCenter+600, main.yCenter-400, main.black);
+%     DrawFormattedText(out.P.win,msg_debug,...
+%         out.P.xCenter+600, out.P.yCenter-400, out.P.black);
     
     
-    Screen('FillRect', main.win, cr.color2, main.square_pos)
-    HELPER_cue(main, 0, [])
+    Screen('FillRect', out.P.win, cr.which_cols2, out.P.square_pos)
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     % dx cue response
-    DrawFormattedText(main.win, '"M" se uguale', main.xCenter+400, ...
-        main.yCenter+350, main.black);
+    DrawFormattedText(out.P.win, '"M" se uguale', out.P.xCenter+400, ...
+        out.P.yCenter+350, out.P.black);
     % sx cue response
-    DrawFormattedText(main.win, '"Z" se diverso', main.xCenter-610, ...
-        main.yCenter+350, main.black);
+    DrawFormattedText(out.P.win, '"Z" se diverso', out.P.xCenter-610, ...
+        out.P.yCenter+350, out.P.black);
     
-    cr.vbl = Screen('Flip', main.win, cr.vbl+.5*main.ifi);
+    cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
     [keyDown, ~, keyCode]=KbCheck;
 
     if keyDown==1
         code=find(keyCode);
-        if code ==main.escapeKey
+        if code ==out.P.escapeKey
              waitResponse=true;
-             sca;
+             out = do_abort(out);
 
-        elseif code==main.zKey
-            main.resp_MEM(cr.lLoop)=0; % z -> different = 0
-            main.codeResp.memory(cr.lLoop) = code; % backup saving original keyboard code response
+        elseif code==out.P.zKey
+            out.blocks(out.blockcount).data(out.trlcount,5)=0; % z -> different = 0
             waitResponse=true;
 
-        elseif code==main.mKey
-            main.resp_MEM(cr.lLoop)=1; % m -> equal = 1
-            main.codeResp.memory(cr.lLoop) = code; % backup saving original keyboard code response
+        elseif code==out.P.mKey
+            out.blocks(out.blockcount).data(out.trlcount,5)=1; % m -> equal = 1
             waitResponse=true;
 
 
@@ -225,15 +218,15 @@ while waitResponse==false
 
 end
 tResp = GetSecs()-base;
-main.timestamp(cr.lLoop, 8) = tResp;
-%main.image_test{cr.lLoop} = Screen('GetImage',main.win);
+out.blocks(out.blockcount).timestamp(out.trlcount, 6) = tResp;
+%out.P.image_test{cr.lLoop} = Screen('GetImage',out.P.win);
 
 
 %% FLASH QUESTION --until response --
 
 % draw grey screen --> ~ 200 ms to flush responses
-Screen('FillRect',main.win, main.grey)
-cr.vbl = Screen('Flip',main.win, cr.vbl+.5*main.ifi);
+Screen('FillRect',out.P.win, out.P.grey)
+cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
 WaitSecs(.2)
 
 waitResponse = false;
@@ -242,35 +235,32 @@ base = GetSecs();
 while waitResponse==false
             
     % prompt response 2
-    Screen('TextSize', main.win, 35);
-    Screen('TextFont', main.win, 'Tahoma');
-    DrawFormattedText(main.win, 'Flash Assente ("z") o Presente ("m")?',...
-        'center', 'center', main.black);
+    Screen('TextSize', out.P.win, 35);
+    Screen('TextFont', out.P.win, 'Tahoma');
+    DrawFormattedText(out.P.win, 'Flash Assente ("z") o Presente ("m")?',...
+        'center', 'center', out.P.black);
      
-    cr.vbl = Screen('Flip', main.win, cr.vbl+.5*main.ifi);
+    cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
 %     if cr.lLoop==1
-%         Screen('AddFrameToMovie',main.win);
+%         Screen('AddFrameToMovie',out.P.win);
 %     end
     
     [keyDown, ~, keyCode]=KbCheck;
 
     if keyDown==1
         code=find(keyCode);
-        if code ==main.escapeKey
+        if code ==out.P.escapeKey
              waitResponse=true;
-             sca;
+             out = do_abort(out);
 
-        elseif code==main.zKey
-            main.resp_FLASH(cr.lLoop)=0; % flash absent (z) = 0
-            main.codeResp.flash(cr.lLoop) = code; % backup saving original keyboard code response
+        elseif code==out.P.zKey
+            out.blocks(out.blockcount).data(out.trlcount,4)=0; % z -> absent = 0
             waitResponse=true;
 
-        elseif code==main.mKey
-            main.resp_FLASH(cr.lLoop)=1; % flash present (m) = 1
-            main.codeResp.flash(cr.lLoop) = code; % backup saving original keyboard code response
+        elseif code==out.P.mKey
+            out.blocks(out.blockcount).data(out.trlcount,4)=1; % m -> present = 1
             waitResponse=true;
-
 
         end
         
@@ -278,15 +268,9 @@ while waitResponse==false
 
 end
 tResp = GetSecs()-base;
-main.timestamp(cr.lLoop, 9) = tResp;
-
-%main.image_test2{cr.lLoop} = Screen('GetImage',main.win);
-
-% if cr.lLoop==1
-%     
-%     Screen('FinalizeMovie', main.movie)
-% 
-% end
-    
+out.blocks(out.blockcount).timestamp(out.trlcount, 7) = tResp;
  
+% always remeber to close the texture or you'll fuck up the graphic card
+Screen('Close', out.P.texture_FLASH);
+
 end    
