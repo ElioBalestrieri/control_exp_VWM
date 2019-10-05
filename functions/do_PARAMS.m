@@ -11,6 +11,8 @@ if P.FLAG.debug
     warning('script executed in debug mode')
 end
 
+
+
 %% start ptb
 
 P = local_init_ptb(P);
@@ -26,11 +28,6 @@ visAngle2pixels = @(deg, main) round((tan(deg*convert/2)*2*main.dist_subj)/...  
 %% define visual features of the experiment 
 % most of them are defined as radius (easier to handle to the center of the
 % screen); 
-
-% define contrast as input from previous module (if present)
-if ~isempty(varargin)
-    P.cntFLASHthres = varargin{1};
-end
 
 % radius of cue 
 P.radius_cue = round(visAngle2pixels(4,P)/2); %###################### 2° of radius --> circle has diameter 4 vis angles    
@@ -83,6 +80,16 @@ P.colormap = [198, 0, 0;...      red
 % background color .5
 P.baseluminance = .5;
 
+% anonymous functions
+P.anon.cnt2weber = @(cnt) cnt/(P.baseluminance);
+P.anon.weber2cnt = @(web) web*P.baseluminance;
+
+% define contrast as input from previous module (if present)
+if ~isempty(varargin)
+    P.cntFLASHthres = P.anon.weber2cnt(varargin{1});
+end
+
+
 %% current trl parameters
 P.frames.fix = 1:100;
 P.frames.squares = 1:49;     % set to 49 frames instead of 50 to take into account stable delay of starting reset sound
@@ -96,8 +103,8 @@ end
 
 %% create subfields preallocate conditions balanced in the block
 
-P.cond.flashVScatch =[0 1];  % flash present vs absent, 2 conditions 
-P.cond.vwm_eqVSdiff =[0 1];  % equal vs different, 2 conditions
+P.cond.flashVScatch =[0 1];  % 1- flash present vs 0- absent, 2 conditions 
+P.cond.vwm_eqVSdiff =[0 1];  % 1- equal vs 0- different, 2 conditions
 P.cond.deltaT = (0:4:60)+15; % take a vector of 16 steps, [0 to 60 frames]--with step 4--(10 msXframe) and sum baseline frames
 
 %% preallocate conditions
@@ -109,6 +116,13 @@ switch in.which_module
         for iB = 1:P.nblocks
             P.B(iB).which_cond = local_preallocate_mainEXP(P);            
         end
+        
+        % create uint8 greyscaled matrix for trials without flash
+        P.greyScaled = uint8(ones(P.rect(4), P.rect(3), 3)*128);
+        
+        % create texture accordingly
+        P.texture_GREY = Screen('MakeTexture', P.win,...
+            P.greyScaled);
         
     case 'VWM'
         P.nblocks = 1;
@@ -137,9 +151,6 @@ for iB = 1:P.nblocks
     in.blocks(iB).timestamp = nan(P.ntrlsblock, 7);
     
 end
-
-% create uint8 greyscaled matrix for trials without flash
-P.greyScaled = uint8(ones(P.rect(4), P.rect(3), 3)*128);
 
 %% back assign parameter structure
 in.P = P;
@@ -261,9 +272,6 @@ end
 
 function P = local_prepare_QUEST(P)
 
-P.anon.cnt2weber = @(cnt) cnt/(P.baseluminance);
-P.anon.weber2cnt = @(web) web*P.baseluminance;
-
 P.Q.tGuess = log10(P.anon.cnt2weber(.1)); 
 P.Q.tGuessSD = 3; 
 P.Q.setThreshold = .6; 
@@ -279,14 +287,5 @@ P.yCoorPrompt = round(sin(pi*P.vectorPi/4)*3*P.yxFLASHnoise(1)+P.yCenter);
 P.xCoorPrompt = round(cos(pi*P.vectorPi/4)*3*P.yxFLASHnoise(2)+P.xCenter);
 
 
-
-
 end
-
-
-
-
-
-
-
 

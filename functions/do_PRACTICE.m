@@ -1,13 +1,23 @@
 function out = do_PRACTICE(out)
 
 foo = out;
+foo.FLAGpractice = true;
 
 switch foo.which_module
 
     case 'VWM'
         
         foo = local_do_instructionsVWM(foo);
-%         foo = do_trial_VWM(foo);
+        
+        trls = randsample(foo.P.ntrlsblock, 12)';
+        foo.blockcount = 1;
+        
+        for itrl = trls
+            
+            foo.trlcount = itrl;
+            foo = do_trial_VWM(foo);
+            
+        end
 
     case 'QUEST'
 
@@ -18,7 +28,14 @@ switch foo.which_module
 
     case 'EXP'
                     
-%         foo = do_trial_EXP(foo);
+        trls = randsample(foo.P.ntrlsblock, 12)';
+        
+        for itrl = trls
+            
+            foo.trlcount = itrl;
+            foo = do_trial_EXP(foo);
+            
+        end
            
 end
 

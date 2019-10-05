@@ -3,7 +3,7 @@ function out = do_trial_EXP(out)
 % empty current (cr) structure
 cr = [];
 % define whether the array is changing
-ischanging = out.P.B(out.blockcount).which_cond(out.trlcount,1);
+ischanging = ~out.P.B(out.blockcount).which_cond(out.trlcount,1);
 % determine square colors for the present trial
 swap_color = out.P.colormap(randsample(1:6,5,'false'),:)';
 cr.which_cols1 = swap_color(:,1:4);
@@ -12,6 +12,18 @@ cr.waitframes = 1:out.P.B(out.blockcount).which_cond(out.trlcount,3);
 cr.postframes = 1:(max(out.P.frames.IsquareInt)-max(cr.waitframes)-1);
 % determine flash vs catch
 cr.isflashpresent = out.P.B(out.blockcount).which_cond(out.trlcount,2);
+
+% fill data array with the info for the current trials (excluding subject
+% response, of course)
+out.blocks(out.blockcount).data(out.trlcount,1) = ... SOA
+    out.P.B(out.blockcount).which_cond(out.trlcount,3);
+
+out.blocks(out.blockcount).data(out.trlcount,2) = ... FLASH PRESENCE
+    out.P.B(out.blockcount).which_cond(out.trlcount,2);
+
+out.blocks(out.blockcount).data(out.trlcount,3) = ... vwm EQUALITY
+    out.P.B(out.blockcount).which_cond(out.trlcount,1);
+
 
 % draw flash image
 [out.P.flashIMAGE, cntX, cntY] = drawFlash_gaussian(out.P.rect(3),...
@@ -128,9 +140,20 @@ for frameL = out.P.frames.flash
     Screen('FillRect',out.P.win, out.P.grey)
     % placeholder
     Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-    %flash texture
-    Screen('DrawTexture', out.P.win, out.P.texture_FLASH, ...
-        out.P.squareFLASH,out.P.squareFLASH);
+    
+    if out.blocks(out.blockcount).data(out.trlcount,2)==1
+    
+        %flash texture
+        Screen('DrawTexture', out.P.win, out.P.texture_FLASH, ...
+            out.P.squareFLASH,out.P.squareFLASH);
+    
+    else
+        
+        %flash texture
+        Screen('DrawTexture', out.P.win, out.P.texture_GREY, ...
+            out.P.squareFLASH,out.P.squareFLASH);
+        
+    end
     
     % Flip to the screen
     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
@@ -221,7 +244,43 @@ tResp = GetSecs()-base;
 out.blocks(out.blockcount).timestamp(out.trlcount, 6) = tResp;
 %out.P.image_test{cr.lLoop} = Screen('GetImage',out.P.win);
 
+%% only in case of practice -1-
+% provide feedback
 
+if isfield(out, 'FLAGpractice')
+    
+    if out.FLAGpractice
+
+        iscorrect = out.blocks(out.blockcount).data(out.trlcount,5)~=...
+            ischanging;
+        
+        Screen('FillRect',out.P.win, out.P.grey)
+
+        if iscorrect
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Corretto! :)',...
+                'center', 'center', [0 255 0]);
+            
+        else
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Sbagliato... :|',...
+                'center', 'center', [255 0 0]);
+
+        end
+        
+        cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
+
+    end
+    
+    WaitSecs(.7)
+    
+end
 %% FLASH QUESTION --until response --
 
 % draw grey screen --> ~ 200 ms to flush responses
