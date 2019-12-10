@@ -9,12 +9,26 @@ else
     out = do_PARAMS(out);
 end
 
+% prepare Eye-tracking input
+out = do_PARAMS_ET(out);
+
+out.eyelinkconnected = false;
 iBlock = 1;
 
 try
+
+    if out.eyelinkconnected
+        [out.E, ~] = EyelinkStart(out.E, out.P.win, ...
+            [macro.subjID '_' argstr], out.eyelinkconnected);    
+    end
+
     
     %% start every module with a small (12 trials) practice block
-    do_PRACTICE(out);
+    repeat_practice = true;
+    while repeat_practice
+        foo = do_PRACTICE(out);
+        repeat_practice = foo.repeatpractice;
+    end
     
     while iBlock <= out.P.nblocks
         
@@ -46,13 +60,31 @@ try
         iBlock = out.blockcount; % if the block was aborted
         iBlock = iBlock +1;
         
+        % save block
+        HELPER_functions('savefile', out)
+
+        
     end
     
 catch ME
     
     ListenChar(0)
+    dircrashes = fullfile(out.macro.root_path, '.crashlog');
+    if ~isfolder(dircrashes); mkdir(dircrashes); end
+    ts = datestr(now, 30);
+    save(fullfile(dircrashes, ['crash_' ts '.mat']), 'ME')
+        
+    HELPER_functions('savefile', out)
+    
+    
+    if out.eyelinkconnected
+        EyelinkStop(out.E, out.eyelinkconnected, out.E.EDFdir);  
+            HELPER_functions('savefile', out)
+    end
+    
     if isfield(out.P, 'pahandle')
         PsychPortAudio('Close', out.P.pahandle);
+        
     end
     sca 
     
@@ -60,7 +92,12 @@ catch ME
     
 end
 
+if out.eyelinkconnected
+    EyelinkStop(out.E, out.eyelinkconnected, out.E.EDFdir);  
+end
+
 ListenChar(0)
+
 if isfield(out.P, 'pahandle')
     PsychPortAudio('Close', out.P.pahandle);
 end

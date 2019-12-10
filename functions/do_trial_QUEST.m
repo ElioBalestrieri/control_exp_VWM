@@ -78,6 +78,20 @@ for frameGo=1:nifisPRE
     Screen('FillRect', out.P.win, out.P.grey);
     % Flip to the screen
     vbl = Screen('Flip', out.P.win, vbl+.5*out.P.ifi);
+    
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
 
 end
 out.blocks.timestamp(out.trlcount, 1) = GetSecs-bslTRL;
@@ -91,6 +105,20 @@ for frameGo = out.P.frames.flash
     % Flip to the screen
     vbl = Screen('Flip',  out.P.win, vbl+.5*out.P.ifi);
 
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
+    
 end
 out.blocks.timestamp(out.trlcount, 2) = GetSecs-bslTRL;
 
@@ -102,6 +130,20 @@ for frameGo=1:nifisPOST
     Screen('FillRect', out.P.win, out.P.grey);
     % Flip to the screen
     vbl = Screen('Flip', out.P.win, vbl+.5*out.P.ifi);
+    
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
 
 end
 out.blocks.timestamp(out.trlcount, 3) = GetSecs-bslTRL;

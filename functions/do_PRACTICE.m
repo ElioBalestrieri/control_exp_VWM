@@ -1,4 +1,4 @@
-function out = do_PRACTICE(out)
+function foo = do_PRACTICE(out)
 
 foo = out;
 foo.FLAGpractice = true;
@@ -38,6 +38,37 @@ switch foo.which_module
         end
            
 end
+
+%% give a message of end practice
+msg_end_practice = ['Practice is over!\n'...
+    'Please remain AS STILL AS POSSIBLE so that we do not need recalibration...\n'...
+    '"Y" -> will make you you want to REPEAT practice\n'...
+    '"N" -> will START the experiment\n'];
+
+no_resp = true;
+
+while no_resp
+
+    Screen('FillRect',foo.P.win, foo.P.grey)
+    DrawFormattedText(foo.P.win, msg_end_practice)
+    Screen('Flip',foo.P.win);
+
+    [~, ~, code] = KbCheck;
+    
+    if find(code)==foo.P.nKey
+        
+        foo.repeatpractice = false;
+        return
+        
+    elseif find(code)==foo.P.yKey 
+        
+        foo.repeatpractice = true;
+        return
+        
+    end
+    
+end
+
 
 end
 

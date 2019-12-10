@@ -123,6 +123,18 @@ for frameL = cr.waitframes
     Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
 %     end
@@ -158,6 +170,20 @@ for frameL = out.P.frames.flash
     % Flip to the screen
     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
+    
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
 %     end
@@ -180,6 +206,20 @@ for frameL = cr.postframes
     
     % flip
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
+    
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
     
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);

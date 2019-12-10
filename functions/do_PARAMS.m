@@ -152,8 +152,14 @@ for iB = 1:P.nblocks
     
 end
 
+% preallocate a fixation break field
+% so that if 4th fixation break ask to jump into recalibration
+in.fixbreak = 0;
+
+
 %% back assign parameter structure
 in.P = P;
+
 
 end
 
@@ -167,7 +173,7 @@ KbName('UnifyKeyNames'); %enables cross-platform key iqd's
 
 P.displayScreen = max(Screen('Screens'));
 rect0 = [0 0 1920 750]; % debug purpose
-[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128]); %, rect0);
+[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128], rect0);
 % Retreive the maximum priority number
 [P.xCenter,P.yCenter] = RectCenter(P.rect);
 P.ifi = Screen('GetFlipInterval', P.win);

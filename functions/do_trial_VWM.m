@@ -28,13 +28,13 @@ waitResponse = false;
 
 %% fixation -- 1 sec -- (100 frame @100Hz)
 
-Screen('FillRect',out.P.win, out.P.grey)
+Screen('FillRect',out.P.win, out.P.grey);
 cr.vbl = Screen('Flip',out.P.win);
 
 base = GetSecs();
 for frameL = out.P.frames.fix
     
-    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4);
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
 
 % movie
@@ -57,8 +57,8 @@ base = GetSecs();
 for frameL = out.P.frames.squares
     
 
-    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-    Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4);
+    Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos);
     
     if frameL == out.P.frames.squares(end-1)
         PsychPortAudio('Start', out.P.pahandle, out.P.repetition, 0, 1);
@@ -86,10 +86,24 @@ base = GetSecs();
 for frameL = out.P.frames.IsquareInt
     
     % draw grey screen
-    Screen('FillRect',out.P.win, out.P.grey)
+    Screen('FillRect',out.P.win, out.P.grey);
     
     Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
+    
+    % fixation control
+    if out.eyelinkconnected
+        [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
+            out.E.gcntrl.ovrsmplbvr);
+    else
+        hsmvd = KbCheck; % debug purpose
+    end
+    
+    if hsmvd
+        out = do_fixcontrol(out);
+        return
+    end
+
     
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
@@ -98,48 +112,6 @@ for frameL = out.P.frames.IsquareInt
 end
 tGap = GetSecs()-base;
 out.blocks(out.blockcount).timestamp(out.trlcount, 3) = tGap;
-
-% %% FLASH
-% 
-% base = GetSecs();
-% for frameL = cr.frames.flash
-% 
-%     Screen('DrawTexture', out.P.win, out.P.texture_FLASH, ...
-%         out.P.squareFLASH,out.P.squareFLASH);
-%     HELPER_cue(main, 0, [])
-%     
-%     % Flip to the screen
-%     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
-%     
-% %     if cr.lLoop==1
-% %         Screen('AddFrameToMovie',out.P.win);
-% %     end
-%     
-% end
-% tFlash = GetSecs()-base;
-% out.P.timestamp(cr.lLoop, 6) = tFlash;
-% %out.P.image_flash{cr.lLoop} = Screen('GetImage',out.P.win);
-
-
-% %% GAP -- 1-delta t -- waiting for test memory array
-% 
-% base = GetSecs();
-% for frameL = cr.frames.wait_after
-%     
-%     % draw grey screen
-%     Screen('FillRect',out.P.win, out.P.grey)
-%     
-%     HELPER_cue(main, 0, [])
-%     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
-%     
-% %     if cr.lLoop==1
-% %         Screen('AddFrameToMovie',out.P.win);
-% %     end
-%     
-% end
-% tArray = GetSecs()-base;
-% out.P.timestamp(cr.lLoop, 7) = tArray;
-
 
 
 %% TEST ARRAY -- until response --
@@ -235,64 +207,5 @@ if isfield(out, 'FLAGpractice')
 end
 
 
-% %% FLASH QUESTION --until response --
-% 
-% % draw grey screen --> ~ 200 ms to flush responses
-% Screen('FillRect',out.P.win, out.P.grey)
-% cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
-% WaitSecs(.2)
-% 
-% waitResponse = false;
-%  
-% base = GetSecs();
-% while waitResponse==false
-%             
-%     % prompt response 2
-%     Screen('TextSize', out.P.win, 35);
-%     Screen('TextFont', out.P.win, 'Tahoma');
-%     DrawFormattedText(out.P.win, 'Flash Assente ("z") o Presente ("m")?',...
-%         'center', 'center', out.P.black);
-%      
-%     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
-%     
-% %     if cr.lLoop==1
-% %         Screen('AddFrameToMovie',out.P.win);
-% %     end
-%     
-%     [keyDown, ~, keyCode]=KbCheck;
-% 
-%     if keyDown==1
-%         code=find(keyCode);
-%         if code ==out.P.escapeKey
-%              waitResponse=true;
-%              sca;
-% 
-%         elseif code==out.P.zKey
-%             out.P.resp_FLASH(cr.lLoop)=0; % flash absent (z) = 0
-%             out.P.codeResp.flash(cr.lLoop) = code; % backup saving original keyboard code response
-%             waitResponse=true;
-% 
-%         elseif code==out.P.mKey
-%             out.P.resp_FLASH(cr.lLoop)=1; % flash present (m) = 1
-%             out.P.codeResp.flash(cr.lLoop) = code; % backup saving original keyboard code response
-%             waitResponse=true;
-% 
-% 
-%         end
-%         
-%    end
-% 
-% end
-% tResp = GetSecs()-base;
-% out.P.timestamp(cr.lLoop, 9) = tResp;
-% 
-% %out.P.image_test2{cr.lLoop} = Screen('GetImage',out.P.win);
-% 
-% % if cr.lLoop==1
-% %     
-% %     Screen('FinalizeMovie', out.P.movie)
-% % 
-% % end
-%     
  
 end    
