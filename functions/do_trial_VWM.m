@@ -151,11 +151,11 @@ while waitResponse==false
              out = do_abort(out);
 
         elseif code==out.P.zKey
-            out.blocks(out.blockcount).data(out.trlcount,5)=0; % z -> different = 0
+            out.blocks(out.blockcount).data(out.trlcount,5)=1; % z -> different = 1 |||| CHANGE DETECTION!!!!!!
             waitResponse=true;
 
         elseif code==out.P.mKey
-            out.blocks(out.blockcount).data(out.trlcount,5)=1; % m -> equal = 1
+            out.blocks(out.blockcount).data(out.trlcount,5)=0; % m -> equal = 0
             waitResponse=true;
 
 

@@ -5,6 +5,7 @@ close all
 clc
 
 %% open dialog and set path for current subject
+addpath(genpath('/home/ebalestr/toolboxes/Psychtoolbox-3-Psychtoolbox-3-9b2e154/Psychtoolbox')) % add ptb -unnecessary in LAB -?-
 
 macro = HELPER_functions('setpaths');
 

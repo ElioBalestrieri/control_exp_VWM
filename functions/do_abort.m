@@ -22,14 +22,20 @@ while no_resp
         
     elseif find(code)==out.P.yKey 
         
-        no_resp2 = true;
+        % bring trial n to end
+        out.trlcount = out.P.ntrlsblock;
+
+        if isfield(out, 'FLAGpractice')
+            
+            return
+            
+        end
         
         WaitSecs(.5)
-            
+        
+        no_resp2 = true;
         while no_resp2
             
-            % bring trial n to end
-            out.trlcount = out.P.ntrlsblock;
             
             msg2 = ['OK, you decided to interrupt the current block\n'...
                     'Now be careful:\n'...

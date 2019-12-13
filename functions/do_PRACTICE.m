@@ -2,6 +2,7 @@ function foo = do_PRACTICE(out)
 
 foo = out;
 foo.FLAGpractice = true;
+npracticetrials = 12;
 
 switch foo.which_module
 
@@ -9,14 +10,29 @@ switch foo.which_module
         
         foo = local_do_instructionsVWM(foo);
         
-        trls = randsample(foo.P.ntrlsblock, 12)';
+        trls = randsample(foo.P.ntrlsblock, npracticetrials)';
         foo.blockcount = 1;
         
-        for itrl = trls
+        itrl = 1;
+        
+        while itrl <= npracticetrials
             
-            foo.trlcount = itrl;
+            this_trl = trls(itrl);
+            foo.trlcount = this_trl;
             foo = do_trial_VWM(foo);
             
+            if foo.trlcount == foo.P.ntrlsblock
+                
+                foo.repeatpractice = false;
+                return
+
+            elseif foo.trlcount == this_trl-1
+                itrl = itrl-1;
+            
+            else
+                itrl = itrl+1;
+            end
+                
         end
 
     case 'QUEST'
@@ -50,7 +66,7 @@ no_resp = true;
 while no_resp
 
     Screen('FillRect',foo.P.win, foo.P.grey)
-    DrawFormattedText(foo.P.win, msg_end_practice)
+    DrawFormattedText(foo.P.win, msg_end_practice, [], [], foo.P.black)
     Screen('Flip',foo.P.win);
 
     [~, ~, code] = KbCheck;
