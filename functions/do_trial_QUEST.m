@@ -201,8 +201,46 @@ out.blocks.data(out.trlcount,4) = subjresp;
 out.blocks.data(out.trlcount,5) = isrespcorrect;
 out.blocks.timestamp(out.trlcount,4) = rt;
 
+
+if isfield(out, 'FLAGpractice')
+    
+    if out.FLAGpractice
+        
+        Screen('FillRect',out.P.win, out.P.grey)
+
+        if isrespcorrect
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Corretto! :)',...
+                'center', 'center', [0 255 0]);
+            
+        else
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Sbagliato... :|',...
+                'center', 'center', [255 0 0]);
+
+        end
+        
+        Screen('Flip', out.P.win);
+
+    end
+    
+    WaitSecs(.7)
+    
+end
+
+
+
 %% update QUEST based on the current response
-out.P.Q.thisQUEST = QuestUpdate(out.P.Q.thisQUEST,log10(cur_web),isrespcorrect);
+if ~isfield(out, 'FLAGpractice')
+    out.P.Q.thisQUEST = QuestUpdate(out.P.Q.thisQUEST,log10(cur_web),isrespcorrect);
+end
+
 Screen('Close', indxMat);
 
 

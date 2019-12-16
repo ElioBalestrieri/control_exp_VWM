@@ -369,6 +369,45 @@ end
 tResp = GetSecs()-base;
 out.blocks(out.blockcount).timestamp(out.trlcount, 7) = tResp;
  
+%% only in case of practice -2-
+% provide feedback
+
+if isfield(out, 'FLAGpractice')
+    
+    if out.FLAGpractice
+
+        iscorrect = out.blocks(out.blockcount).data(out.trlcount,4)==...
+            cr.isflashpresent;
+        
+        Screen('FillRect',out.P.win, out.P.grey)
+
+        if iscorrect
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Corretto! :)',...
+                'center', 'center', [0 255 0]);
+            
+        else
+            
+            % correct feedback
+            Screen('TextSize', out.P.win, 35);
+            Screen('TextFont', out.P.win, 'Tahoma');
+            DrawFormattedText(out.P.win, 'Sbagliato... :|',...
+                'center', 'center', [255 0 0]);
+
+        end
+        
+        cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
+
+    end
+    
+    WaitSecs(.7)
+    
+end
+
+
 % always remeber to close the texture or you'll fuck up the graphic card
 Screen('Close', out.P.texture_FLASH);
 

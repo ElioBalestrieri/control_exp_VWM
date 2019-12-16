@@ -2,7 +2,9 @@ function foo = do_PRACTICE(out)
 
 foo = out;
 foo.FLAGpractice = true;
+foo.blockcount = 1;
 npracticetrials = 12;
+npractice_QUEST = 5;
 
 switch foo.which_module
 
@@ -11,7 +13,6 @@ switch foo.which_module
         foo = local_do_instructionsVWM(foo);
         
         trls = randsample(foo.P.ntrlsblock, npracticetrials)';
-        foo.blockcount = 1;
         
         itrl = 1;
         
@@ -40,19 +41,65 @@ switch foo.which_module
         foo = local_do_instructionsQUEST(foo);
         
         % in QUEST's case the best solution for practice could be to 
-        % not to update the first 5 trials?
+        % not to update the first 5 t        
+        itrl = 1;
+        while itrl <= npractice_QUEST
+            
+            foo.trlcount = itrl;
+            
+            foo = do_trial_QUEST(foo);
+            
+            if foo.trlcount == foo.P.ntrlsblock
+                
+                foo.repeatpractice = false;
+                return
+
+            elseif foo.trlcount == itrl-1
+                
+                itrl = itrl-1;
+            
+            else
+                
+                itrl = itrl+1;
+            
+            end
+
+            
+        end
+        
+        
+
 
     case 'EXP'
                     
-        trls = randsample(foo.P.ntrlsblock, 12)';
+        foo = local_do_instructionsEXP(foo);
         
-        for itrl = trls
+        trls = randsample(foo.P.ntrlsblock, npracticetrials)';
+        
+        itrl = 1;
+        
+        while itrl <= npracticetrials
             
-            foo.trlcount = itrl;
+            this_trl = trls(itrl);
+            foo.trlcount = this_trl;
+
             foo = do_trial_EXP(foo);
             
+                   
+            if foo.trlcount == foo.P.ntrlsblock
+                
+                foo.repeatpractice = false;
+                return
+
+            elseif foo.trlcount == this_trl-1
+                itrl = itrl-1;
+            
+            else
+                itrl = itrl+1;
+            end
+                
         end
-           
+        
 end
 
 %% give a message of end practice
@@ -124,7 +171,7 @@ Screen('Flip',out.P.win);
 KbStrokeWait;
 
 msg3 = ['The squares will be followed by a blank interval.\n'...
-        'You will have to keep the colours in mind and keep fixating the square'];
+        'You will have to keep the colours in mind and keep fixating the circle'];
     
 msgPress = 'Press a button to continue';
 
@@ -201,6 +248,101 @@ DrawFormattedText(foo.P.win, welMsg4, 'center', foo.P.pxlScreen(2)/2+350, foo.P.
 Screen('Flip', foo.P.win);
 
 KbStrokeWait
+
+
+end
+
+function foo = local_do_instructionsEXP(foo)
+
+out = foo;
+
+swap_color = out.P.colormap(randsample(1:6,5,'false'),:)';
+cr.which_cols1 = swap_color(:,1:4);
+
+
+msg1 = ['Every trial will start with a circle.\n'...
+        'You will have to maintain fixation inside this circle'];
+    
+msgPress = 'Press a button to continue';
+
+Screen('FillRect',out.P.win, out.P.grey)
+Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+DrawFormattedText(out.P.win, msg1, 'center', out.P.yCenter-300)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
+
+msg2 = '4 colored squares will appear...';
+
+Screen('FillRect',out.P.win, out.P.grey)
+Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+DrawFormattedText(out.P.win, msg2, 'center', out.P.yCenter-300)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
+
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
+
+msg3 = ['The squares will be followed by a blank interval.\n'...
+        'You will have to keep the colours in mind and keep fixating the circle'];
+    
+
+Screen('FillRect',out.P.win, out.P.grey)
+Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+DrawFormattedText(out.P.win, msg3, 'center', out.P.yCenter-300)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
+
+
+msg3bis = ['In some trials a flash might appear.\n'...
+        'Your second task is to detect this flash.\n'...
+        'It can occupy different positions inside the circle'];
+ 
+[swapMatWelcome, welcX1, welcY1] = drawFlash_gaussian(out.P.rect(3),...
+    out.P.rect(4), .25, out.P.radiusFLASH,...
+    .5, 2000, out.P.yxFLASHnoise);
+    
+squareFLASH1 = [welcX1-foo.P.radiusFLASH, welcY1-foo.P.radiusFLASH,...
+            welcX1+foo.P.radiusFLASH, welcY1+foo.P.radiusFLASH];
+
+indxMatWelcome = Screen('MakeTexture', foo.P.win, uint8(swapMatWelcome*255));
+
+    
+Screen('FillRect',out.P.win, out.P.grey)
+Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+DrawFormattedText(out.P.win, msg3bis, 'center', out.P.yCenter-300)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+Screen('DrawTexture', foo.P.win, indxMatWelcome, squareFLASH1, squareFLASH1);
+
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
+
+
+
+msg4 = ['4 colored squares will appear again\n'...
+        'Your task will be to say whether they are equal("M")\n'...
+        'or different ("Z")'];
+
+Screen('FillRect',out.P.win, out.P.grey)
+Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+DrawFormattedText(out.P.win, msg4, 'center', out.P.yCenter-300)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
+
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
+
+Screen('FillRect',out.P.win, out.P.grey)
+DrawFormattedText(out.P.win, 'Ready to go?\nPress a button if so.', 'center', 'center')
+Screen('Flip',out.P.win);
+
+KbStrokeWait;
 
 
 end

@@ -195,9 +195,9 @@ P.greenfix = round([0 0.6 0]*255);
 P.srStrct = Screen('Resolution', P.displayScreen);
 P.pxlScreen = [P.srStrct.width, P.srStrct.height];
 % manual measurements of screen dimension, since
-% " Screen('DisplaySize',main.displayScreen); "  was inaccurate [????]
-P.m_width = 520;
-P.m_height = 294;    
+% " Screen('DisplaySize',main.displayScreen); "  was inaccurate [????] [598, 336]
+P.m_width = 598;
+P.m_height = 336;    
 
 P.size_mm_screen = [P.m_width, P.m_height];
 P.size_1px_wid_heig = P.size_mm_screen./P.pxlScreen; % scale ~equal for each dimension: take average
@@ -238,6 +238,9 @@ P.escapeKey = KbName('ESCAPE');
 
 % hide cursor
 HideCursor(P.displayScreen);
+
+% alpha blending 
+Screen('BlendFunction', P.win, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 end
