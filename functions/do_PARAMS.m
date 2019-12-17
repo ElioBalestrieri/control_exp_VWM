@@ -18,12 +18,13 @@ end
 P = local_init_ptb(P);
 
 % subject distance from screen (mm)
-P.dist_subj = 600;
+P.dist_subj = 860;
 
 convert = pi/180; % 1° -> conversion degree to radians
 visAngle2pixels = @(deg, main) round((tan(deg*convert/2)*2*main.dist_subj)/...  V = 2*arctan(S/2D) --> V/2 = arctan(S/2D) --> tan(V/2) = S/2D --> 
     main.size_1px_mm);% ##CHECK                                                    S = tan(V/2)*2D [D observer distance; V vis angle; S segment length]
 
+P.pixperdeg = round(visAngle2pixels(1, P));
 
 %% define visual features of the experiment 
 % most of them are defined as radius (easier to handle to the center of the
@@ -173,7 +174,7 @@ KbName('UnifyKeyNames'); %enables cross-platform key iqd's
 
 P.displayScreen = max(Screen('Screens'));
 rect0 = [0 0 1920 750]; % debug purpose
-[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128], rect0);
+[P.win,P.rect] = Screen('OpenWindow',P.displayScreen,[128 128 128]); %, rect0);
 % Retreive the maximum priority number
 [P.xCenter,P.yCenter] = RectCenter(P.rect);
 P.ifi = Screen('GetFlipInterval', P.win);

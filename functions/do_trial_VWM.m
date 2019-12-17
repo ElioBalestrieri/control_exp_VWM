@@ -30,6 +30,7 @@ waitResponse = false;
 
 Screen('FillRect',out.P.win, out.P.grey);
 cr.vbl = Screen('Flip',out.P.win);
+do_trigger(out, 1)
 
 base = GetSecs();
 for frameL = out.P.frames.fix
@@ -66,10 +67,16 @@ for frameL = out.P.frames.squares
 %         [out.P.actualStartTime, ~, ~, out.P.estStopTime] = ...
 %             PsychPortAudio('Stop', out.P.pahandle, 0, 0);
 
+    elseif frameL ==1
+        
+        do_trigger(out, 100)
+        
     end
     
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
+        
+        
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
 %     end
@@ -90,6 +97,13 @@ for frameL = out.P.frames.IsquareInt
     
     Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
+    
+    if frameL == 1
+        
+        do_trigger(out, 99)
+        
+    end
+
     
     % fixation control
     if out.eyelinkconnected
@@ -117,6 +131,7 @@ out.blocks(out.blockcount).timestamp(out.trlcount, 3) = tGap;
 %% TEST ARRAY -- until response --
 
 base = GetSecs();
+acc = 0;
 while waitResponse==false
     
 %     %debug square cuing
@@ -127,8 +142,8 @@ while waitResponse==false
 %         out.P.xCenter+600, out.P.yCenter-400, out.P.black);
     
     
-    Screen('FillRect', out.P.win, cr.which_cols2, out.P.square_pos)
-    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
+    Screen('FillRect', out.P.win, cr.which_cols2, out.P.square_pos);
+    Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4);
     % dx cue response
     DrawFormattedText(out.P.win, '"M" se uguale', out.P.xCenter+400, ...
         out.P.yCenter+350, out.P.black);
@@ -138,6 +153,14 @@ while waitResponse==false
     
     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
+    acc = acc+1;
+    
+    if acc == 1
+        
+        do_trigger(out, 200+ischanging)
+        
+    end
+
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
 %     end
@@ -153,12 +176,15 @@ while waitResponse==false
         elseif code==out.P.zKey
             out.blocks(out.blockcount).data(out.trlcount,5)=1; % z -> different = 1 |||| CHANGE DETECTION!!!!!!
             waitResponse=true;
+            
+            do_trigger(out, 301)
 
         elseif code==out.P.mKey
             out.blocks(out.blockcount).data(out.trlcount,5)=0; % m -> equal = 0
             waitResponse=true;
 
-
+            do_trigger(out, 300)
+            
         end
         
     end
@@ -178,7 +204,7 @@ if isfield(out, 'FLAGpractice')
         iscorrect = out.blocks(out.blockcount).data(out.trlcount,5)==...
             ischanging;
         
-        Screen('FillRect',out.P.win, out.P.grey)
+        Screen('FillRect',out.P.win, out.P.grey);
 
         if iscorrect
             

@@ -4,7 +4,7 @@ P = out.P;
 %% definition of eyelink-specific substructure
 
 out.E.myWidth = P.pxlScreen(1);
-out.E.myHeight = P.pxlScreen(1);
+out.E.myHeight = P.pxlScreen(2);
 out.E.BgColor = P.grey;
 out.E.EDFdir = out.macro.data_path;
 out.E.gui = 0;
@@ -20,8 +20,8 @@ out.E.gcntrl.ignblnk = 0;
 out.E.gcntrl.ovrsmplbvr = 0; 
 out.E.CenterX = P.xCenter;
 out.E.CenterY = P.yCenter;
-out.E.FixLenDeg = P.radius_cue;
-
+out.E.FixLenDeg = 2; % P.radius_cue;
+out.E.pixperdeg = P.pixperdeg;
 
 
 

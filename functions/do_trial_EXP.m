@@ -62,6 +62,9 @@ waitResponse = false;
 
 Screen('FillRect',out.P.win, out.P.grey)
 cr.vbl = Screen('Flip',out.P.win);
+do_trigger(out, 1)
+
+do_trigger(out, numel(cr.waitframes))
 
 base = GetSecs();
 for frameL = out.P.frames.fix
@@ -98,6 +101,10 @@ for frameL = out.P.frames.squares
 %         [out.P.actualStartTime, ~, ~, out.P.estStopTime] = ...
 %             PsychPortAudio('Stop', out.P.pahandle, 0, 0);
 
+    elseif frameL ==1
+        
+        do_trigger(out, 100)
+
     end
     
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
@@ -123,6 +130,12 @@ for frameL = cr.waitframes
     Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
     cr.vbl = Screen('Flip',out.P.win, cr.vbl+.5*out.P.ifi);
     
+    if frameL == 1
+        
+        do_trigger(out, 99)
+        
+    end
+   
     % fixation control
     if out.eyelinkconnected
         [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
@@ -133,6 +146,7 @@ for frameL = cr.waitframes
     
     if hsmvd
         out = do_fixcontrol(out);
+        Screen('Close', out.P.texture_FLASH);
         return
     end
 %     if cr.lLoop==1
@@ -158,6 +172,10 @@ for frameL = out.P.frames.flash
         %flash texture
         Screen('DrawTexture', out.P.win, out.P.texture_FLASH, ...
             out.P.squareFLASH,out.P.squareFLASH);
+        
+        % send trigger    
+        do_trigger(out, 1000)
+
     
     else
         
@@ -170,6 +188,7 @@ for frameL = out.P.frames.flash
     % Flip to the screen
     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
     
+        
     % fixation control
     if out.eyelinkconnected
         [~,~,hsmvd] = EyelinkGetGaze(out.E, out.E.gcntrl.ignblnk, ...
@@ -180,6 +199,7 @@ for frameL = out.P.frames.flash
     
     if hsmvd
         out = do_fixcontrol(out);
+        Screen('Close', out.P.texture_FLASH);
         return
     end
 
@@ -217,6 +237,7 @@ for frameL = cr.postframes
     
     if hsmvd
         out = do_fixcontrol(out);
+        Screen('Close', out.P.texture_FLASH);
         return
     end
 
@@ -233,6 +254,8 @@ out.blocks(out.blockcount).timestamp(out.trlcount, 5) = tArray;
 %% TEST ARRAY -- until response --
 
 base = GetSecs();
+acc = 0;
+
 while waitResponse==false
     
 %     %debug square cuing
@@ -253,6 +276,14 @@ while waitResponse==false
         out.P.yCenter+350, out.P.black);
     
     cr.vbl = Screen('Flip', out.P.win, cr.vbl+.5*out.P.ifi);
+        acc = acc+1;
+    
+    if acc == 1
+        
+        do_trigger(out, 200+ischanging)
+        
+    end
+
     
 %     if cr.lLoop==1
 %         Screen('AddFrameToMovie',out.P.win);
@@ -267,14 +298,18 @@ while waitResponse==false
              out = do_abort(out);
 
         elseif code==out.P.zKey
-            out.blocks(out.blockcount).data(out.trlcount,5)=0; % z -> different = 0
+            out.blocks(out.blockcount).data(out.trlcount,5)=1; % z -> different = 1 |||| CHANGE DETECTION!!!!!!
             waitResponse=true;
+            
+            do_trigger(out, 301)
 
         elseif code==out.P.mKey
-            out.blocks(out.blockcount).data(out.trlcount,5)=1; % m -> equal = 1
+            out.blocks(out.blockcount).data(out.trlcount,5)=0; % m -> equal = 0
             waitResponse=true;
 
+            do_trigger(out, 300)
 
+            
         end
         
     end
@@ -291,7 +326,7 @@ if isfield(out, 'FLAGpractice')
     
     if out.FLAGpractice
 
-        iscorrect = out.blocks(out.blockcount).data(out.trlcount,5)~=...
+        iscorrect = out.blocks(out.blockcount).data(out.trlcount,5)==...
             ischanging;
         
         Screen('FillRect',out.P.win, out.P.grey)
@@ -356,10 +391,14 @@ while waitResponse==false
         elseif code==out.P.zKey
             out.blocks(out.blockcount).data(out.trlcount,4)=0; % z -> absent = 0
             waitResponse=true;
-
+            
+            do_trigger(out, 400)
+            
         elseif code==out.P.mKey
             out.blocks(out.blockcount).data(out.trlcount,4)=1; % m -> present = 1
             waitResponse=true;
+            
+            do_trigger(out, 401)
 
         end
         

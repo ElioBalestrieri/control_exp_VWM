@@ -30,9 +30,9 @@ switch foo.which_module
             elseif foo.trlcount == this_trl-1
                 itrl = itrl-1;
             
-            else
-                itrl = itrl+1;
             end
+                
+            itrl = itrl+1;
                 
         end
 
@@ -58,12 +58,10 @@ switch foo.which_module
                 
                 itrl = itrl-1;
             
-            else
-                
-                itrl = itrl+1;
-            
             end
-
+                
+            itrl = itrl+1;
+            
             
         end
         
@@ -94,10 +92,10 @@ switch foo.which_module
             elseif foo.trlcount == this_trl-1
                 itrl = itrl-1;
             
-            else
-                itrl = itrl+1;
             end
                 
+            itrl = itrl+1;
+
         end
         
 end
@@ -152,8 +150,8 @@ msgPress = 'Press a button to continue';
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg1, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg1, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('Flip',out.P.win);
 
 KbStrokeWait;
@@ -162,8 +160,8 @@ msg2 = '4 colored squares will appear...';
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg2, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg2, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
 
 Screen('Flip',out.P.win);
@@ -177,8 +175,8 @@ msgPress = 'Press a button to continue';
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg3, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg3, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('Flip',out.P.win);
 
 KbStrokeWait;
@@ -189,8 +187,8 @@ msg4 = ['4 colored squares will appear again\n'...
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg4, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg4, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
 
 Screen('Flip',out.P.win);
@@ -267,8 +265,8 @@ msgPress = 'Press a button to continue';
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg1, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg1, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('Flip',out.P.win);
 
 KbStrokeWait;
@@ -277,8 +275,8 @@ msg2 = '4 colored squares will appear...';
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg2, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg2, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
 
 Screen('Flip',out.P.win);
@@ -291,8 +289,8 @@ msg3 = ['The squares will be followed by a blank interval.\n'...
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg3, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg3, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('Flip',out.P.win);
 
 KbStrokeWait;
@@ -314,8 +312,8 @@ indxMatWelcome = Screen('MakeTexture', foo.P.win, uint8(swapMatWelcome*255));
     
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg3bis, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg3bis, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('DrawTexture', foo.P.win, indxMatWelcome, squareFLASH1, squareFLASH1);
 
 Screen('Flip',out.P.win);
@@ -330,8 +328,8 @@ msg4 = ['4 colored squares will appear again\n'...
 
 Screen('FillRect',out.P.win, out.P.grey)
 Screen('FrameArc', out.P.win, [0 0 0], out.P.rect_cue, 0, 360, 4,4)
-DrawFormattedText(out.P.win, msg4, 'center', out.P.yCenter-300)
-DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+300)
+DrawFormattedText(out.P.win, msg4, 'center', out.P.yCenter-400)
+DrawFormattedText(out.P.win, msgPress, 'center', out.P.yCenter+400)
 Screen('FillRect', out.P.win, cr.which_cols1, out.P.square_pos)
 
 Screen('Flip',out.P.win);

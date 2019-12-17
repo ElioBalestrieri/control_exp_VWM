@@ -67,7 +67,7 @@ else
     %... then open dialog window
     dlg_title = 'no QUEST run: which contrast?';
     prompt = {'contrast'};
-    definput = {num2str(.15)};
+    definput = {num2str(.07)};
     subj_answer = inputdlg(prompt,dlg_title,1,definput); 
     
     macro.contrast = str2double(subj_answer{1});
@@ -77,7 +77,7 @@ end
 %% realexp part
 if macro.FLAG.EXP
     
-    if macro.contrast>.25 || macro.contrast<.05
+    if macro.contrast>.15 || macro.contrast<.01
         error('improbable contrast value')
     end
     
